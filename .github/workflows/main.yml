@@ -1,0 +1,40 @@
+name: Android Build
+
+on:
+  push:
+    branches:
+      - trunk  # Change to your main branch if different
+  pull_request:
+    branches:
+      - trunk  # Change this as needed
+  workflow_dispatch: # Allows manual runs
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17' # Adjust based on your project
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant Execute Permission to Gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Built-APK
+          path: app/build/outputs/apk/debug/*.apk
